@@ -14,6 +14,9 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Force classic architecture – third-party native modules (react-native-pcm-audio) don't support New Arch yet
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
+
 target 'ElevenNative' do
   config = use_native_modules!
 

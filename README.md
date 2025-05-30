@@ -66,7 +66,7 @@ This is one way to run your app — you can also build it directly from Android 
 
 Now that you have successfully run the app, let's make changes!
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
 
 When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
 
@@ -95,3 +95,67 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+# ElevenNative
+
+A reference React-Native 0.79 iOS app that shows ultra-low-latency **bidirectional** PCM streaming with the ElevenLabs Conversational-AI WebSocket.
+
+*   Mic captured @ 16 kHz / 16-bit / mono via `react-native-live-audio-stream`.
+*   Streams straight to ElevenLabs; receives audio chunks back and plays them immediately with a 40-line Swift native module (`PCMPlayer`).
+*   **No files ever touch disk** – pure memory buffers.
+*   Works on real devices (classic architecture – new-arch disabled).
+
+---
+
+## Quick start
+```bash
+# clone & install
+npm i               # or pnpm / yarn
+cd ios && pod install && cd ..
+
+# start Metro on all interfaces (important for real device)
+npx react-native start -- --reset-cache --host 0.0.0.0
+
+# plug in the iPhone (same Wi-Fi as Mac) and run
+npx react-native run-ios --device "My iPhone"
+```
+Edit **`ios/ElevenNative/AppDelegate.swift`** and replace `192.168.x.x` with your Mac's Wi-Fi IP if needed.
+
+The chat-style screen is in `ConversationScreen.tsx`; tap the round mic to talk, tap again to stop.
+
+---
+
+## Directory layout
+```
+App.tsx                     – entry, renders ConversationScreen
+ConversationScreen.tsx      – minimal chat UI + mic button
+useElevenLabsConversation.ts – hook owning WS + audio input/output
+PCMPlayer.ts                – JS façade for native player
+
+ios/ElevenNative/
+  PCMPlayer.swift           – tiny Swift native module
+  PCMPlayerBridge.m         – Obj-C bridge for React-Native
+  AppDelegate.swift         – RN bootstrap + Metro URL
+  main.m                    – classic entry point
+```
+
+---
+
+## How playback works
+1.  ElevenLabs sends base-64 PCM chunks (16 k / Int16 / mono).
+2.  `PCMPlayer.ts` forwards to Swift.
+3.  `PCMPlayer.swift` decodes → `AVAudioPCMBuffer` (16 k / Int16).
+4.  A single `AVAudioConverter` resamples / converts to mixer format (44.1 k or 48 k / Float32 / stereo).
+5.  Converted buffer is scheduled on an `AVAudioPlayerNode` – latency ≈ 64 ms (1024 frames @ 16 k).
+
+---
+
+## Troubleshooting
+| Symptom | Fix |
+|---------|-----|
+| **Could not connect to the server** | Metro must run with `--host 0.0.0.0`; hard-code IP in `AppDelegate.swift`. |
+| **duplicate symbol _main**         | Remove `@main` from Swift `AppDelegate`, keep classic `main.m`. |
+| **OSStatus -10868**                | Use `AVAudioConverter`, don't connect 16 k format to mixer directly. |
+| No audio but logs scheduling       | Check iPhone volume & ringer; confirm `[PCMPlayer] playerNode.playing: 1`. |
+
+MIT licence – use at will. :)

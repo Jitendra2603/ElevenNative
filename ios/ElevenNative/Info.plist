@@ -48,5 +48,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Talking to the ElevenLabs AI assistant</string>
 </dict>
 </plist>

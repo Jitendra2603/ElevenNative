@@ -14,6 +14,7 @@ import {
   Text,
   useColorScheme,
   View,
+  SafeAreaView,
 } from 'react-native';
 
 import {
@@ -23,6 +24,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import ElevenLabsButton from './ElevenLabsButton';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -73,7 +75,7 @@ function App(): React.JSX.Element {
   const safePadding = '5%';
 
   return (
-    <View style={backgroundStyle}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
@@ -104,12 +106,19 @@ function App(): React.JSX.Element {
           </Section>
           <LearnMoreLinks />
         </View>
+        <ElevenLabsButton agentId="0tjYsxZlQF7N9Lflb3yL" />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0f172a',
+  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,

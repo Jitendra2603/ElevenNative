@@ -10,8 +10,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "buffer": "^6.0.3",
     "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react-native": "0.79.2",
+    "react-native-live-audio-stream": "^1.1.1",
+    "react-native-pcm-audio": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
